@@ -1,0 +1,39 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Application",
+      "type": "stlinkgdbtarget",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "deviceName": "STM32N657X0H3Q",
+      "deviceCore": "Cortex-M55",
+      "runEntry": "main",
+      "serverPort": "50000",
+      "imagesAndSymbols": [
+        {
+          "imageFileName": "${workspaceFolder}/Appli/build/n6_USB_MIC_Appli.elf"
+        }
+      ]
+    },
+    {
+      "name": "Debug FSBL",
+      "type": "stlinkgdbtarget",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "deviceName": "STM32N657X0H3Q",
+      "deviceCore": "Cortex-M55",
+      "runEntry": "main",
+      "serverPort": "50000",
+      "imagesAndSymbols": [
+        {
+          "imageFileName": "${workspaceFolder}/FSBL/build/n6_USB_MIC_FSBL.elf",
+          "symbolFileName": "${workspaceFolder}/FSBL/build/n6_USB_MIC_FSBL.elf"
+        },
+        {
+          "symbolFileName": "${workspaceFolder}/Appli/build/n6_USB_MIC_Appli.elf"
+        }
+      ]
+    }
+  ]
+}

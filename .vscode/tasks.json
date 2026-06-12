@@ -1,0 +1,196 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build FSBL",
+      "type": "shell",
+      "command": "C:/ST/STM32CubeCLT_1.21.0/CMake/bin/cmake.exe",
+      "args": [
+        "--build",
+        "${workspaceFolder}/FSBL/build"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": "$gcc"
+    },
+    {
+      "label": "Build Application",
+      "type": "shell",
+      "command": "C:/ST/STM32CubeCLT_1.21.0/CMake/bin/cmake.exe",
+      "args": [
+        "--build",
+        "${workspaceFolder}/Appli/build"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": "$gcc"
+    },
+    {
+      "label": "Create FSBL binary",
+      "type": "shell",
+      "command": "C:/ST/STM32CubeCLT_1.21.0/GNU-tools-for-STM32/bin/arm-none-eabi-objcopy.exe",
+      "args": [
+        "-O",
+        "binary",
+        "${workspaceFolder}/FSBL/build/n6_USB_MIC_FSBL.elf",
+        "${workspaceFolder}/FSBL/build/n6_USB_MIC_FSBL.bin"
+      ],
+      "dependsOn": [
+        "Build FSBL"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Create Application binary",
+      "type": "shell",
+      "command": "C:/ST/STM32CubeCLT_1.21.0/GNU-tools-for-STM32/bin/arm-none-eabi-objcopy.exe",
+      "args": [
+        "-O",
+        "binary",
+        "${workspaceFolder}/Appli/build/n6_USB_MIC_Appli.elf",
+        "${workspaceFolder}/Appli/build/n6_USB_MIC_Appli.bin"
+      ],
+      "dependsOn": [
+        "Build Application"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Sign FSBL for external flash boot",
+      "type": "shell",
+      "command": "C:/ST/STM32CubeCLT_1.21.0/STM32CubeProgrammer/bin/STM32_SigningTool_CLI.exe",
+      "args": [
+        "-bin",
+        "${workspaceFolder}/FSBL/build/n6_USB_MIC_FSBL.bin",
+        "-nk",
+        "-of",
+        "0x80000000",
+        "-t",
+        "fsbl",
+        "-hv",
+        "2.3",
+        "-align",
+        "-s",
+        "-o",
+        "${workspaceFolder}/FSBL/build/n6_USB_MIC_FSBL_signed.bin"
+      ],
+      "dependsOn": [
+        "Create FSBL binary"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Sign Application for external flash boot",
+      "type": "shell",
+      "command": "C:/ST/STM32CubeCLT_1.21.0/STM32CubeProgrammer/bin/STM32_SigningTool_CLI.exe",
+      "args": [
+        "-bin",
+        "${workspaceFolder}/Appli/build/n6_USB_MIC_Appli.bin",
+        "-nk",
+        "-of",
+        "0x80000000",
+        "-t",
+        "fsbl",
+        "-hv",
+        "2.3",
+        "-align",
+        "-s",
+        "-o",
+        "${workspaceFolder}/Appli/build/n6_USB_MIC_Appli_signed.bin"
+      ],
+      "dependsOn": [
+        "Create Application binary"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Program Application to external flash",
+      "type": "shell",
+      "command": "C:/Program Files/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI.exe",
+      "args": [
+        "-c",
+        "port=SWD",
+        "mode=HOTPLUG",
+        "-el",
+        "C:/Program Files/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/ExternalLoader/MX25UM51245G_STM32N6570-NUCLEO.stldr",
+        "-w",
+        "${workspaceFolder}/Appli/build/n6_USB_MIC_Appli_signed.bin",
+        "0x70100000",
+        "-v"
+      ],
+      "dependsOn": [
+        "Sign Application for external flash boot"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Program FSBL to external flash",
+      "type": "shell",
+      "command": "C:/Program Files/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI.exe",
+      "args": [
+        "-c",
+        "port=SWD",
+        "mode=HOTPLUG",
+        "-el",
+        "C:/Program Files/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/ExternalLoader/MX25UM51245G_STM32N6570-NUCLEO.stldr",
+        "-w",
+        "${workspaceFolder}/FSBL/build/n6_USB_MIC_FSBL_signed.bin",
+        "0x70000000",
+        "-v"
+      ],
+      "dependsOn": [
+        "Sign FSBL for external flash boot"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Reset board for external flash boot",
+      "type": "shell",
+      "command": "C:/Program Files/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI.exe",
+      "args": [
+        "-c",
+        "port=SWD",
+        "mode=HOTPLUG",
+        "-hardRst"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Flash both images and boot from external flash",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "Program Application to external flash",
+        "Program FSBL to external flash",
+        "Reset board for external flash boot"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    }
+  ]
+}
