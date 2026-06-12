@@ -30,7 +30,7 @@ set(STM32_LINKER_SCRIPT STM32N657XX_LRUN.ld)
 set(STM32_LINKER_OPTION  )
 
 # Set the project name
-set(CMAKE_PROJECT_NAME n6_USB_MIC_Appli)
+set(CMAKE_PROJECT_NAME n6_KEYWORD_Appli)
 project(${CMAKE_PROJECT_NAME})
 
 # Create an executable object type

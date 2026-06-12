@@ -12,7 +12,7 @@
       "serverPort": "50000",
       "imagesAndSymbols": [
         {
-          "imageFileName": "${workspaceFolder}/Appli/build/n6_USB_MIC_Appli.elf"
+          "imageFileName": "${workspaceFolder}/Appli/build/n6_KEYWORD_Appli.elf"
         }
       ]
     },
@@ -27,11 +27,11 @@
       "serverPort": "50000",
       "imagesAndSymbols": [
         {
-          "imageFileName": "${workspaceFolder}/FSBL/build/n6_USB_MIC_FSBL.elf",
-          "symbolFileName": "${workspaceFolder}/FSBL/build/n6_USB_MIC_FSBL.elf"
+          "imageFileName": "${workspaceFolder}/FSBL/build/n6_KEYWORD_FSBL.elf",
+          "symbolFileName": "${workspaceFolder}/FSBL/build/n6_KEYWORD_FSBL.elf"
         },
         {
-          "symbolFileName": "${workspaceFolder}/Appli/build/n6_USB_MIC_Appli.elf"
+          "symbolFileName": "${workspaceFolder}/Appli/build/n6_KEYWORD_Appli.elf"
         }
       ]
     }

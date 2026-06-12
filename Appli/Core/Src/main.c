@@ -36,7 +36,7 @@
 #define I2S_RX_FRAMES_PER_HALF    6U
 
 #define I2S_RX_HALF_FREE          0U
-#define I2S_RX_HALF_READY         1U
+#define I2S_RX_HALF_READY         1U  
 #define I2S_RX_HALF_PROCESSING    2U
 /* USER CODE END PD */
 
