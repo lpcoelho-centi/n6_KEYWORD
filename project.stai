@@ -1,0 +1,16 @@
+{
+  "toolchain": "Makefile",
+  "variant": "ApplicationTemplate",
+  "fromMx": true,
+  "isGenerated": true,
+  "name": "n6_KEYWORD",
+  "createdAt": 1781521156490,
+  "lastModified": 1781521204810,
+  "lastAccessed": 1781521204810,
+  "type": "MxProject",
+  "mcu": "STM32N657X0H3Q",
+  "board": "NUCLEO-N657X0-Q",
+  "contextProject": "FullSecure",
+  "ioc": "",
+  "generator": "STM32CubeMX1"
+}

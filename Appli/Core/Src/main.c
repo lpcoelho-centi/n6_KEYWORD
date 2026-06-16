@@ -18,12 +18,14 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "cmsis_os2.h"
 #include "app_usbx.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stdbool.h"
 #include "ux_device_audio_record.h"
+#include "app_freertos.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -33,11 +35,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define I2S_RX_FRAMES_PER_HALF    6U
-
-#define I2S_RX_HALF_FREE          0U
-#define I2S_RX_HALF_READY         1U  
-#define I2S_RX_HALF_PROCESSING    2U
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -46,6 +43,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+CACHEAXI_HandleTypeDef hcacheaxi;
 
 I2S_HandleTypeDef hi2s1;
 DMA_NodeTypeDef Node_GPDMA1_Channel0 __NON_CACHEABLE;
@@ -61,10 +59,12 @@ PCD_HandleTypeDef hpcd_USB_OTG_HS1;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
+void MX_FREERTOS_Init(void);
 static void MX_GPIO_Init(void);
 static void MX_GPDMA1_Init(void);
 static void MX_LPUART1_UART_Init(void);
 static void MX_I2S1_Init(void);
+static void MX_CACHEAXI_Init(void);
 static void SystemIsolation_Config(void);
 /* USER CODE BEGIN PFP */
 
@@ -72,48 +72,6 @@ static void SystemIsolation_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-static volatile bool i2s_rx_overrun = false;
-
-static uint32_t i2s_rx_slots[2][2 * I2S_RX_FRAMES_PER_HALF] __NON_CACHEABLE;
-
-static volatile uint8_t i2s_rx_half_state[2] =
-{
-  I2S_RX_HALF_FREE,
-  I2S_RX_HALF_FREE
-};
-
-static HAL_StatusTypeDef StartI2sReceive(void)
-{
-  return HAL_I2S_Receive_DMA(&hi2s1,
-                             (uint16_t *)i2s_rx_slots,
-                             2U * I2S_RX_FRAMES_PER_HALF * 2U );
-}
-
-static int32_t ClaimReadyI2sHalf(void)
-{
-  __disable_irq();
-  for (uint32_t half_index = 0U; half_index < 2; half_index++)
-  {
-    if (i2s_rx_half_state[half_index] == I2S_RX_HALF_READY)
-    {
-      i2s_rx_half_state[half_index] = I2S_RX_HALF_PROCESSING;
-      __enable_irq();
-      return (int32_t)half_index;
-    }
-  }
-  __enable_irq();
-  return -1;
-}
-
-static void PublishReadyI2sHalf(uint32_t half_index)
-{
-  if (i2s_rx_half_state[half_index] != I2S_RX_HALF_FREE)
-  {
-    i2s_rx_overrun = true;
-  }
-  i2s_rx_half_state[half_index] = I2S_RX_HALF_READY;
-}
 /* USER CODE END 0 */
 
 /**
@@ -145,13 +103,20 @@ int main(void)
   MX_USB1_OTG_HS_PCD_Init();
   MX_I2S1_Init();
   MX_USBX_Init();
+  MX_CACHEAXI_Init();
   SystemIsolation_Config();
   /* USER CODE BEGIN 2 */
-  if (StartI2sReceive() != HAL_OK)
-  {
-    Error_Handler();
-  }
   /* USER CODE END 2 */
+
+  /* Init scheduler */
+  osKernelInitialize();
+  /* Call init function for freertos objects (in app_freertos.c) */
+  MX_FREERTOS_Init();
+
+  /* Start scheduler */
+  osKernelStart();
+
+  /* We should never get here as control is now taken by the scheduler */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -160,27 +125,34 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
-    int32_t ready_half_index = ClaimReadyI2sHalf();
-
-    if(i2s_rx_overrun)
-    {
-      i2s_rx_overrun = false;
-      HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_RESET); 
-    }
-
-    if (ready_half_index >= 0)
-    {  
-    
-    (void)USBD_AUDIO_RecordingWriteLeft(
-          i2s_rx_slots[ready_half_index],
-          I2S_RX_FRAMES_PER_HALF);
-      
-      i2s_rx_half_state[ready_half_index] = I2S_RX_HALF_FREE;
-    }
-    ux_system_tasks_run();
   }
   /* USER CODE END 3 */
+}
+
+/**
+  * @brief CACHEAXI Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_CACHEAXI_Init(void)
+{
+
+  /* USER CODE BEGIN CACHEAXI_Init 0 */
+
+  /* USER CODE END CACHEAXI_Init 0 */
+
+  /* USER CODE BEGIN CACHEAXI_Init 1 */
+
+  /* USER CODE END CACHEAXI_Init 1 */
+  hcacheaxi.Instance = CACHEAXI;
+  if (HAL_CACHEAXI_Init(&hcacheaxi) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN CACHEAXI_Init 2 */
+
+  /* USER CODE END CACHEAXI_Init 2 */
+
 }
 
 /**
@@ -440,8 +412,29 @@ void HAL_I2S_ErrorCallback(I2S_HandleTypeDef *hi2s)
     Error_Handler();
   }
 }
-
 /* USER CODE END 4 */
+
+/**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM6 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM6)
+  {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.

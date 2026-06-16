@@ -87,6 +87,51 @@ void HAL_MspInit(void)
 }
 
 /**
+  * @brief CACHEAXI MSP Initialization
+  * This function configures the hardware resources used in this example
+  * @param hcacheaxi: CACHEAXI handle pointer
+  * @retval None
+  */
+void HAL_CACHEAXI_MspInit(CACHEAXI_HandleTypeDef* hcacheaxi)
+{
+  if(hcacheaxi->Instance==CACHEAXI)
+  {
+    /* USER CODE BEGIN CACHEAXI_MspInit 0 */
+
+    /* USER CODE END CACHEAXI_MspInit 0 */
+    /* Peripheral clock enable */
+    __HAL_RCC_CACHEAXI_CLK_ENABLE();
+    /* USER CODE BEGIN CACHEAXI_MspInit 1 */
+
+    /* USER CODE END CACHEAXI_MspInit 1 */
+
+  }
+
+}
+
+/**
+  * @brief CACHEAXI MSP De-Initialization
+  * This function freeze the hardware resources used in this example
+  * @param hcacheaxi: CACHEAXI handle pointer
+  * @retval None
+  */
+void HAL_CACHEAXI_MspDeInit(CACHEAXI_HandleTypeDef* hcacheaxi)
+{
+  if(hcacheaxi->Instance==CACHEAXI)
+  {
+    /* USER CODE BEGIN CACHEAXI_MspDeInit 0 */
+
+    /* USER CODE END CACHEAXI_MspDeInit 0 */
+    /* Peripheral clock disable */
+    __HAL_RCC_CACHEAXI_CLK_DISABLE();
+    /* USER CODE BEGIN CACHEAXI_MspDeInit 1 */
+
+    /* USER CODE END CACHEAXI_MspDeInit 1 */
+  }
+
+}
+
+/**
   * @brief I2S MSP Initialization
   * This function configures the hardware resources used in this example
   * @param hi2s: I2S handle pointer
@@ -253,7 +298,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LPUART1;
     PeriphClkInitStruct.Lpuart1ClockSelection = RCC_LPUART1CLKSOURCE_IC9;
     PeriphClkInitStruct.ICSelection[RCC_IC9].ClockSelection = RCC_ICCLKSOURCE_PLL2;
-    PeriphClkInitStruct.ICSelection[RCC_IC9].ClockDivider = 16;
+    PeriphClkInitStruct.ICSelection[RCC_IC9].ClockDivider = 6;
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
     {
       Error_Handler();
