@@ -32,7 +32,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdint.h>
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -59,7 +59,7 @@ ULONG USBD_AUDIO_RecordingStreamGetMaxFrameBufferNumber(VOID);
 ULONG USBD_AUDIO_RecordingStreamGetMaxFrameBufferSize(VOID);
 
 /* USER CODE BEGIN EFP */
-UINT USBD_AUDIO_RecordingWriteLeft(const uint32_t *stereo_slots,
+UINT USBD_AUDIO_RecordingPushLeft(const uint32_t *stereo_slots,
                                    ULONG frame_count);
 /* USER CODE END EFP */
 

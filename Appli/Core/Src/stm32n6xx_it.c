@@ -216,7 +216,6 @@ void USB1_OTG_HS_IRQHandler(void)
   /* USER CODE END USB1_OTG_HS_IRQn 0 */
   HAL_PCD_IRQHandler(&hpcd_USB_OTG_HS1);
   /* USER CODE BEGIN USB1_OTG_HS_IRQn 1 */
-
   /* USER CODE END USB1_OTG_HS_IRQn 1 */
 }
 

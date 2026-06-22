@@ -20,7 +20,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 /* USER CODE BEGIN Includes */
-
 /* USER CODE END Includes */
 extern DMA_NodeTypeDef Node_GPDMA1_Channel0;
 

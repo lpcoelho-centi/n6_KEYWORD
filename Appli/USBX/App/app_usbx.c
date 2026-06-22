@@ -21,29 +21,30 @@
 /* Includes ------------------------------------------------------------------*/
 #include "app_usbx.h"
 
-/* USER CODE BEGIN UX_Memory_Buffer */
-
-/* USER CODE END UX_Memory_Buffer */
-#if defined ( __ICCARM__ )
-#pragma data_alignment=4
-#endif
-__ALIGN_BEGIN static UCHAR ux_byte_pool_buffer[USBX_APP_MEM_POOL_SIZE] __ALIGN_END;
-
 /**
   * @brief  Application USBX Initialization.
-  * @param  none
+  * @param  memory_ptr: memory pointer
   * @retval status
   */
-UINT MX_USBX_Init(VOID)
+UINT MX_USBX_Init(VOID *memory_ptr)
 {
   UINT ret = UX_SUCCESS;
+
   UCHAR *pointer;
+  TX_BYTE_POOL *byte_pool = (TX_BYTE_POOL*)memory_ptr;
 
   /* USER CODE BEGIN MX_USBX_Init0 */
 
   /* USER CODE END MX_USBX_Init0 */
 
-  pointer = ux_byte_pool_buffer;
+  /* Allocate the stack for USBX Memory */
+  if (tx_byte_allocate(byte_pool, (VOID **) &pointer,
+                       USBX_MEMORY_STACK_SIZE, TX_NO_WAIT) != TX_SUCCESS)
+  {
+    /* USER CODE BEGIN USBX_ALLOCATE_STACK_ERROR */
+    return TX_POOL_ERROR;
+    /* USER CODE END USBX_ALLOCATE_STACK_ERROR */
+  }
 
   /* Initialize USBX Memory */
   if (ux_system_initialize(pointer, USBX_MEMORY_STACK_SIZE, UX_NULL, 0) != UX_SUCCESS)
@@ -53,7 +54,7 @@ UINT MX_USBX_Init(VOID)
     /* USER CODE END USBX_SYSTEM_INITIALIZE_ERROR */
   }
 
-  ret = MX_USBX_Device_Init();
+  ret = MX_USBX_Device_Init(byte_pool);
   if(ret != UX_SUCCESS)
   {
   /* USER CODE BEGIN MX_USBX_Device_Init_Error */
@@ -69,54 +70,6 @@ UINT MX_USBX_Init(VOID)
 
   return ret;
 }
-/**
-  * @brief  _ux_utility_interrupt_disable
-  *         USB utility interrupt disable.
-  * @param  none
-  * @retval none
-  */
-ALIGN_TYPE _ux_utility_interrupt_disable(VOID)
-{
-  UINT interrupt_save = 0;
-  /* USER CODE BEGIN _ux_utility_interrupt_disable */
-  interrupt_save = __get_PRIMASK();
-  __disable_irq();
-  /* USER CODE END _ux_utility_interrupt_disable */
-
-  return interrupt_save;
-}
-
-/**
-  * @brief  _ux_utility_interrupt_restore
-  *         USB utility interrupt restore.
-  * @param  flags
-  * @retval none
-  */
-VOID _ux_utility_interrupt_restore(ALIGN_TYPE flags)
-{
-
-  /* USER CODE BEGIN _ux_utility_interrupt_restore */
-  __set_PRIMASK(flags);
-  /* USER CODE END _ux_utility_interrupt_restore */
-}
-
-/**
-  * @brief  _ux_utility_time_get
-  *         Get Time Tick for host timing.
-  * @param  none
-  * @retval time tick
-  */
-ULONG _ux_utility_time_get(VOID)
-{
-  ULONG time_tick = 0U;
-
-  /* USER CODE BEGIN _ux_utility_time_get */
-
-  /* USER CODE END _ux_utility_time_get */
-
-  return time_tick;
-}
-
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */

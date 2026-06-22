@@ -41,14 +41,13 @@ extern "C" {
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
-#define USBX_APP_MEM_POOL_SIZE       (65 * 1024)
 #define USBX_MEMORY_STACK_SIZE       (55 * 1024)
 /* USER CODE BEGIN EC */
 
 /* USER CODE END EC */
 
 /* Exported functions prototypes ---------------------------------------------*/
-UINT MX_USBX_Init(VOID);
+UINT MX_USBX_Init(VOID *memory_ptr);
 
 /* USER CODE BEGIN 1 */
 

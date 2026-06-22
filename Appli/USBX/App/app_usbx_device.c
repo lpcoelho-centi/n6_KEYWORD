@@ -47,26 +47,29 @@ static ULONG audio_configuration_number;
 static UX_DEVICE_CLASS_AUDIO_PARAMETER audio_parameter;
 static UX_DEVICE_CLASS_AUDIO_STREAM_PARAMETER audio_stream_parameter[USBD_AUDIO_STREAM_NMNBER];
 static uint8_t audio_stream_index = 0U;
+static TX_THREAD ux_device_app_thread;
 
 /* USER CODE BEGIN PV */
 extern PCD_HandleTypeDef           hpcd_USB_OTG_HS1;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
-static UINT USBD_ChangeFunction(ULONG Device_State);
+static VOID app_ux_device_thread_entry(ULONG thread_input);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /**
   * @brief  Application USBX Device Initialization.
-  * @param  none
+  * @param  memory_ptr: memory pointer
   * @retval status
   */
 
-UINT MX_USBX_Device_Init(VOID)
+UINT MX_USBX_Device_Init(VOID *memory_ptr)
 {
   UINT ret = UX_SUCCESS;
+  UCHAR *pointer;
+  TX_BYTE_POOL *byte_pool = (TX_BYTE_POOL*)memory_ptr;
   /* USER CODE BEGIN MX_USBX_Device_Init 0 */
   /* USER CODE END MX_USBX_Device_Init 0 */
 
@@ -80,6 +83,26 @@ UINT MX_USBX_Device_Init(VOID)
 
   /* USER CODE BEGIN MX_USBX_Device_Init 1 */
   /* USER CODE END MX_USBX_Device_Init 1 */
+
+  /* Allocate the stack for device application main thread */
+  if (tx_byte_allocate(byte_pool, (VOID **) &pointer, UX_DEVICE_APP_THREAD_STACK_SIZE,
+                       TX_NO_WAIT) != TX_SUCCESS)
+  {
+    /* USER CODE BEGIN MAIN_THREAD_ALLOCATE_STACK_ERROR */
+    return TX_POOL_ERROR;
+    /* USER CODE END MAIN_THREAD_ALLOCATE_STACK_ERROR */
+  }
+
+  /* Create the device application main thread */
+  if (tx_thread_create(&ux_device_app_thread, UX_DEVICE_APP_THREAD_NAME, app_ux_device_thread_entry,
+                       0, pointer, UX_DEVICE_APP_THREAD_STACK_SIZE, UX_DEVICE_APP_THREAD_PRIO,
+                       UX_DEVICE_APP_THREAD_PREEMPTION_THRESHOLD, UX_DEVICE_APP_THREAD_TIME_SLICE,
+                       UX_DEVICE_APP_THREAD_START_OPTION) != TX_SUCCESS)
+  {
+    /* USER CODE BEGIN MAIN_THREAD_CREATE_ERROR */
+    return TX_THREAD_ERROR;
+    /* USER CODE END MAIN_THREAD_CREATE_ERROR */
+  }
 
   /* USER CODE BEGIN MX_USBX_Device_Init 2 */
   /* USER CODE END MX_USBX_Device_Init 2 */
@@ -130,7 +153,7 @@ UINT MX_USBX_Device_Stack_Init(void)
                                  string_framework_length,
                                  language_id_framework,
                                  language_id_framework_length,
-                                 USBD_ChangeFunction) != UX_SUCCESS)
+                                 UX_NULL) != UX_SUCCESS)
   {
     /* USER CODE BEGIN USBX_DEVICE_INITIALIZE_ERROR */
     return UX_ERROR;
@@ -153,8 +176,8 @@ UINT MX_USBX_Device_Stack_Init(void)
   audio_stream_parameter[audio_stream_index].ux_device_class_audio_stream_parameter_max_frame_buffer_size
     = USBD_AUDIO_RecordingStreamGetMaxFrameBufferSize();
 
-  audio_stream_parameter[audio_stream_index].ux_device_class_audio_stream_parameter_task_function
-    = ux_device_class_audio_write_task_function;
+  audio_stream_parameter[audio_stream_index].ux_device_class_audio_stream_parameter_thread_entry
+    = ux_device_class_audio_write_thread_entry;
 
   /* Set the parameters for audio device */
   audio_parameter.ux_device_class_audio_parameter_streams_nb  = USBD_AUDIO_STREAM_NMNBER;
@@ -203,6 +226,18 @@ UINT MX_USBX_Device_Stack_Init(void)
 }
 
 /**
+  * @brief  Function implementing app_ux_device_thread_entry.
+  * @param  thread_input: User thread input parameter.
+  * @retval none
+  */
+static VOID app_ux_device_thread_entry(ULONG thread_input)
+{
+  /* USER CODE BEGIN app_ux_device_thread_entry */
+  TX_PARAMETER_NOT_USED(thread_input);
+  /* USER CODE END app_ux_device_thread_entry */
+}
+
+/**
   * @brief MX_USBX_Device_Stack_DeInit
   *        Unitialization of USB Device.
   * uninitialize the device stack, unregister of device class stack
@@ -238,94 +273,6 @@ UINT MX_USBX_Device_Stack_DeInit(void)
   return ret;
 }
 
-/**
-  * @brief  USBD_ChangeFunction
-  *         This function is called when the device state changes.
-  * @param  Device_State: USB Device State
-  * @retval status
-  */
-static UINT USBD_ChangeFunction(ULONG Device_State)
-{
-   UINT status = UX_SUCCESS;
-
-  /* USER CODE BEGIN USBD_ChangeFunction0 */
-
-  /* USER CODE END USBD_ChangeFunction0 */
-
-  switch (Device_State)
-  {
-    case UX_DEVICE_ATTACHED:
-
-      /* USER CODE BEGIN UX_DEVICE_ATTACHED */
-
-      /* USER CODE END UX_DEVICE_ATTACHED */
-
-      break;
-
-    case UX_DEVICE_REMOVED:
-
-      /* USER CODE BEGIN UX_DEVICE_REMOVED */
-
-      /* USER CODE END UX_DEVICE_REMOVED */
-
-      break;
-
-    case UX_DCD_STM32_DEVICE_CONNECTED:
-
-      /* USER CODE BEGIN UX_DCD_STM32_DEVICE_CONNECTED */
-
-      /* USER CODE END UX_DCD_STM32_DEVICE_CONNECTED */
-
-      break;
-
-    case UX_DCD_STM32_DEVICE_DISCONNECTED:
-
-      /* USER CODE BEGIN UX_DCD_STM32_DEVICE_DISCONNECTED */
-
-      /* USER CODE END UX_DCD_STM32_DEVICE_DISCONNECTED */
-
-      break;
-
-    case UX_DCD_STM32_DEVICE_SUSPENDED:
-
-      /* USER CODE BEGIN UX_DCD_STM32_DEVICE_SUSPENDED */
-
-      /* USER CODE END UX_DCD_STM32_DEVICE_SUSPENDED */
-
-      break;
-
-    case UX_DCD_STM32_DEVICE_RESUMED:
-
-      /* USER CODE BEGIN UX_DCD_STM32_DEVICE_RESUMED */
-
-      /* USER CODE END UX_DCD_STM32_DEVICE_RESUMED */
-
-      break;
-
-    case UX_DCD_STM32_SOF_RECEIVED:
-
-      /* USER CODE BEGIN UX_DCD_STM32_SOF_RECEIVED */
-
-      /* USER CODE END UX_DCD_STM32_SOF_RECEIVED */
-
-      break;
-
-    default:
-
-      /* USER CODE BEGIN DEFAULT */
-
-      /* USER CODE END DEFAULT */
-
-      break;
-
-  }
-
-  /* USER CODE BEGIN USBD_ChangeFunction1 */
-
-  /* USER CODE END USBD_ChangeFunction1 */
-
-  return status;
-}
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
