@@ -1,0 +1,2 @@
+Generate Project
+Copying previous project files from C:\Users\lpcoelho\GitHub\n6_board\n6_AI_Audio\.ai\run\run-2 to C:\Users\lpcoelho\GitHub\n6_board\n6_AI_Audio\.ai\run\run-2\.ai\generate\backup

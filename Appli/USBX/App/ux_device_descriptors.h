@@ -339,7 +339,7 @@ uint16_t USBD_Get_Configuration_Number(uint8_t class_type, uint8_t interface_typ
 #define USBD_LANGID_STRING                            1033
 #define USBD_MANUFACTURER_STRING                      "The Cook"
 #define USBD_PRODUCT_STRING                           "MIC"
-#define USBD_SERIAL_NUMBER                            "23"
+#define USBD_SERIAL_NUMBER                            "2313"
 
 #define USB_DESC_TYPE_INTERFACE                       0x04U
 #define USB_DESC_TYPE_ENDPOINT                        0x05U
@@ -393,7 +393,7 @@ uint16_t USBD_Get_Configuration_Number(uint8_t class_type, uint8_t interface_typ
 #define USBD_AUDIO_RECORD_RES_BYTE                    ((USBD_AUDIO_RECORD_RES_BIT + 7) / 8)
 #define USBD_AUDIO_RECORD_CHANNEL_MAP                 1U
 
-#define USBD_AUDIO_RECORD_FREQ_MAX                    USBD_AUDIO_FREQ_48_K
+#define USBD_AUDIO_RECORD_FREQ_MAX                    USBD_AUDIO_FREQ_16_K
 
 #define USBD_AUDIO_RECORD_FREQ_COUNT                  1U
 #define USBD_AUDIO_RECORD_DEFAULT_FREQ                USBD_AUDIO_RECORD_FREQ_MAX

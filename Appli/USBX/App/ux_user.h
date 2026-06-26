@@ -577,11 +577,11 @@
 
 /* This is the ThreadX priority value for the USBX enumeration threads that monitors the bus topology */
 
-#define UX_THREAD_PRIORITY_ENUM           4
+/* #define UX_THREAD_PRIORITY_ENUM           20 */
 
 /* This is the ThreadX priority value for the standard USBX threads */
 
-#define UX_THREAD_PRIORITY_CLASS          3
+/* #define UX_THREAD_PRIORITY_CLASS          20 */
 
 /* This is the ThreadX priority value for the USBX HID keyboard class. */
 
@@ -617,7 +617,8 @@
 /* #define UX_ENABLE_ERROR_CHECKING */
 
 /* USER CODE BEGIN 2 */
-
+#define UX_THREAD_PRIORITY_ENUM           4
+#define UX_THREAD_PRIORITY_CLASS          4
 /* USER CODE END 2 */
 
 #endif

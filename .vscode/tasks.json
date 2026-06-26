@@ -34,8 +34,8 @@
       "args": [
         "-O",
         "binary",
-        "${workspaceFolder}/FSBL/build/n6_KEYWORD_FSBL.elf",
-        "${workspaceFolder}/FSBL/build/n6_KEYWORD_FSBL.bin"
+        "${workspaceFolder}/FSBL/build/n6_AI_Audio_FSBL.elf",
+        "${workspaceFolder}/FSBL/build/n6_AI_Audio_FSBL.bin"
       ],
       "dependsOn": [
         "Build FSBL"
@@ -52,8 +52,8 @@
       "args": [
         "-O",
         "binary",
-        "${workspaceFolder}/Appli/build/n6_KEYWORD_Appli.elf",
-        "${workspaceFolder}/Appli/build/n6_KEYWORD_Appli.bin"
+        "${workspaceFolder}/Appli/build/n6_AI_Audio_Appli.elf",
+        "${workspaceFolder}/Appli/build/n6_AI_Audio_Appli.bin"
       ],
       "dependsOn": [
         "Build Application"
@@ -69,7 +69,7 @@
       "command": "C:/ST/STM32CubeCLT_1.21.0/STM32CubeProgrammer/bin/STM32_SigningTool_CLI.exe",
       "args": [
         "-bin",
-        "${workspaceFolder}/FSBL/build/n6_KEYWORD_FSBL.bin",
+        "${workspaceFolder}/FSBL/build/n6_AI_Audio_FSBL.bin",
         "-nk",
         "-of",
         "0x80000000",
@@ -80,7 +80,7 @@
         "-align",
         "-s",
         "-o",
-        "${workspaceFolder}/FSBL/build/n6_KEYWORD_FSBL_signed.bin"
+        "${workspaceFolder}/FSBL/build/n6_AI_Audio_FSBL_signed.bin"
       ],
       "dependsOn": [
         "Create FSBL binary"
@@ -96,7 +96,7 @@
       "command": "C:/ST/STM32CubeCLT_1.21.0/STM32CubeProgrammer/bin/STM32_SigningTool_CLI.exe",
       "args": [
         "-bin",
-        "${workspaceFolder}/Appli/build/n6_KEYWORD_Appli.bin",
+        "${workspaceFolder}/Appli/build/n6_AI_Audio_Appli.bin",
         "-nk",
         "-of",
         "0x80000000",
@@ -107,7 +107,7 @@
         "-align",
         "-s",
         "-o",
-        "${workspaceFolder}/Appli/build/n6_KEYWORD_Appli_signed.bin"
+        "${workspaceFolder}/Appli/build/n6_AI_Audio_Appli_signed.bin"
       ],
       "dependsOn": [
         "Create Application binary"
@@ -128,7 +128,7 @@
         "-el",
         "C:/Program Files/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/ExternalLoader/MX25UM51245G_STM32N6570-NUCLEO.stldr",
         "-w",
-        "${workspaceFolder}/Appli/build/n6_KEYWORD_Appli_signed.bin",
+        "${workspaceFolder}/Appli/build/n6_AI_Audio_Appli_signed.bin",
         "0x70100000",
         "-v"
       ],
@@ -151,7 +151,7 @@
         "-el",
         "C:/Program Files/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/ExternalLoader/MX25UM51245G_STM32N6570-NUCLEO.stldr",
         "-w",
-        "${workspaceFolder}/FSBL/build/n6_KEYWORD_FSBL_signed.bin",
+        "${workspaceFolder}/FSBL/build/n6_AI_Audio_FSBL_signed.bin",
         "0x70000000",
         "-v"
       ],

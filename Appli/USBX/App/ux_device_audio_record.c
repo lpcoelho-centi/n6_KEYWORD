@@ -40,7 +40,7 @@
 #define USB_AUDIO_FS_SAMPLES_PER_PACKET (USBD_AUDIO_RECORD_DEFAULT_FREQ / 1000U)
 #define USB_AUDIO_MAX_SAMPLES_PER_PACKET USB_AUDIO_FS_SAMPLES_PER_PACKET
 #define USB_AUDIO_MAX_PACKET_BYTES      (USB_AUDIO_MAX_SAMPLES_PER_PACKET * USB_AUDIO_BYTES_PER_SAMPLE)
-#define USB_AUDIO_FIFO_SAMPLE_COUNT     1024U
+#define USB_AUDIO_FIFO_SAMPLE_COUNT     256U
 #define USB_AUDIO_PREBUFFER_PACKETS     16U
 #define USB_AUDIO_QUEUE_TARGET_PACKETS  16U
 #define USB_AUDIO_FIFO_HIGH_WATERMARK   ((USB_AUDIO_FIFO_SAMPLE_COUNT * 3U) / 4U)
@@ -446,7 +446,7 @@ UINT USBD_AUDIO_RecordingPushLeft(const uint32_t *stereo_slots,
   {
     uint32_t sample;
 
-    sample = stereo_slots[frame_index * I2S_SLOTS_PER_FRAME] & 0x00FFFFFFU;
+    sample = stereo_slots[frame_index * I2S_SLOTS_PER_FRAME] & 0x00FFFFFFU; // Left channel only
     AudioFifoPush(sample);
   }
 

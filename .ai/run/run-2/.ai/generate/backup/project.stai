@@ -1,0 +1,17 @@
+{
+  "toolchain": "Makefile",
+  "variant": "Validation",
+  "fromMx": true,
+  "isGenerated": false,
+  "name": "run-2",
+  "createdAt": 1781521156490,
+  "lastModified": 1782406118745,
+  "lastAccessed": 1782406118745,
+  "type": "MxProject",
+  "mcu": "STM32N657X0H3Q",
+  "board": "NUCLEO-N657X0-Q",
+  "contextProject": "FullSecure",
+  "ioc": "",
+  "generator": "STM32CubeMX1",
+  "path": "C:\\Users\\lpcoelho\\GitHub\\n6_board\\n6_AI_Audio"
+}

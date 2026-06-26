@@ -12,7 +12,7 @@ include(ExternalProject)
 set(CMAKE_CXX_COMPILER_FORCED "true")
 
 # Set the project name
-set(CMAKE_PROJECT_NAME n6_KEYWORD)
+set(CMAKE_PROJECT_NAME n6_AI_Audio)
 
 # Core project settings
 project(${CMAKE_PROJECT_NAME})

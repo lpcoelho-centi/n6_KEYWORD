@@ -1,0 +1,115 @@
+{
+  "aton_execution_time": [
+    {
+      "c_layer_name": "EpochBlock_1",
+      "counters": [
+        3020,
+        6977,
+        1038
+      ],
+      "cycles": 11036,
+      "cycles_by_macc": 0,
+      "duration_ms": 0.018393333815038205,
+      "percentage": 1.2978210185609322
+    },
+    {
+      "c_layer_name": "EpochBlock_2",
+      "counters": [
+        6298,
+        7031,
+        18726
+      ],
+      "cycles": 32057,
+      "cycles_by_macc": 0,
+      "duration_ms": 0.05342866685241461,
+      "percentage": 3.7698900880090083
+    },
+    {
+      "c_layer_name": "EpochBlock_3 -> 15",
+      "counters": [
+        844,
+        778584,
+        330
+      ],
+      "cycles": 779758,
+      "cycles_by_macc": 0,
+      "duration_ms": 1.2995980024337768,
+      "percentage": 91.69874369698942
+    },
+    {
+      "c_layer_name": "EpochBlock_16",
+      "counters": [
+        265,
+        74,
+        19015
+      ],
+      "cycles": 19354,
+      "cycles_by_macc": 0,
+      "duration_ms": 0.032257833145558835,
+      "percentage": 2.2760905820841164
+    },
+    {
+      "c_layer_name": "EpochBlock_17",
+      "counters": [
+        694,
+        74,
+        7372
+      ],
+      "cycles": 8141,
+      "cycles_by_macc": 0,
+      "duration_ms": 0.013569500017911195,
+      "percentage": 0.9574546143565175
+    }
+  ],
+  "environment": {
+    "generated_model": {
+      "generated_time": "2026-06-25T17:51:34+0100",
+      "name": "network"
+    },
+    "network_signature": "0xb012cec05d1a8264",
+    "target": "stm32 family - 0x486 - STM32N6xx @600/400MHz",
+    "test_name": "",
+    "tools": [
+      {
+        "arguments": "validate --model C:\\Users\\lpcoelho\\Downloads\\yamnet_e256_64x96_tl_int8.tflite --batch-size 10 --mode target --st-neural-art user_profile@C:\\Users\\lpcoelho\\GitHub\\n6_board\\n6_AI_Audio\\.ai\\run\\run-2\\.ai\\profile-neural-art.json --name network --verbosity 1 --c-api st-ai --target stm32n6 --workspace C:\\Users\\lpcoelho\\GitHub\\n6_board\\n6_AI_Audio\\.ai\\run\\run-2\\.ai\\st_ai_ws --output C:\\Users\\lpcoelho\\GitHub\\n6_board\\n6_AI_Audio\\.ai\\run\\run-2\\.ai\\st_ai_output --desc serial:COM16:115200 --save-csv",
+        "environment": [
+          "STATS_TYPE=STM32CUBEAI-STUDIO"
+        ],
+        "input_model": {
+          "model_files": [
+            {
+              "name": "yamnet_e256_64x96_tl_int8.tflite",
+              "signature": "0x5ed65e3c9c79b8384b9ad19cf341f1af"
+            }
+          ],
+          "n_params": 134730,
+          "name": "yamnet_e256_64x96_tl_int8",
+          "size": 139176,
+          "type": "tflite"
+        },
+        "name": "ST.EdgeAI.Core",
+        "version": "4.0.1-20581 7ed50de05"
+      }
+    ]
+  },
+  "json_schema_version": "2.0",
+  "validation": {
+    "device": "VALIDATION_TARGET",
+    "val_error": 0.0006765823345631361,
+    "val_error_desc": "x-cross (rmse) #1",
+    "val_metrics": [
+      {
+        "acc": "100.00%",
+        "cos": 0.9999976754188538,
+        "desc": "X-cross #1",
+        "l2r": 0.0021588923409581184,
+        "mae": 0.00011718749738065526,
+        "mean": -3.9062499126885086e-05,
+        "nse": 0.9999948658881905,
+        "rmse": 0.0006765823345631361,
+        "snr": 53.31535816192627,
+        "std": 0.0006788565660826862
+      }
+    ]
+  }
+}

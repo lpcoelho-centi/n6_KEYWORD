@@ -71,7 +71,6 @@
 #define TX_USER_H
 
 /* USER CODE BEGIN 1 */
-
 /* USER CODE END 1 */
 
 /* Define various build options for the ThreadX port.  The application should either make changes

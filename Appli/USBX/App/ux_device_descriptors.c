@@ -49,7 +49,7 @@ uint8_t UserClassInstance[USBD_MAX_CLASS_INTERFACES] = {
 };
 
 ULONG USBD_AUDIO20_RECORDING_FREQENCIES[USBD_AUDIO_RECORD_FREQ_COUNT] = {
-  USBD_AUDIO_FREQ_48_K,
+  USBD_AUDIO_FREQ_16_K,
 };
 /* The generic device descriptor buffer that will be filled by builder
    Size of the buffer is the maximum possible device FS descriptor size. */

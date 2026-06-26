@@ -25,6 +25,9 @@
 /* USER CODE BEGIN Includes */
 #include "main.h"
 #include "ux_device_audio_record.h"
+#include "app_x-cube-ai.h"
+#include "kws_audio.h"
+#include "npu_init.h"
 
 /* USER CODE END Includes */
 
@@ -35,13 +38,18 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define I2S_RX_FRAMES_PER_HALF          48U
+
+
+#define I2S_RX_FRAMES_PER_HALF          64U
 #define I2S_RX_HALF_FREE                0U
 #define I2S_RX_HALF_READY               1U
 #define I2S_RX_HALF_PROCESSING          2U
 
 #define ACQUISITION_THREAD_STACK_SIZE   2048U
 #define ACQUISITION_THREAD_PRIORITY     6U
+
+#define AI_THREAD_STACK_SIZE            16384U
+#define AI_THREAD_PRIORITY              10U
 
 /* USER CODE END PD */
 
@@ -55,6 +63,10 @@
 static TX_THREAD acquisition_thread;
 static TX_SEMAPHORE acquisition_semaphore;
 static ULONG acquisition_thread_stack[ACQUISITION_THREAD_STACK_SIZE / sizeof(ULONG)];
+
+static TX_THREAD ai_thread;
+static TX_SEMAPHORE ai_semaphore;
+static ULONG ai_thread_stack[AI_THREAD_STACK_SIZE / sizeof(ULONG)];
 
 static uint32_t i2s_rx_slots[2][2U * I2S_RX_FRAMES_PER_HALF] __NON_CACHEABLE;
 static volatile uint8_t i2s_rx_half_state[2] =
@@ -71,6 +83,7 @@ extern I2S_HandleTypeDef hi2s1;
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN PFP */
 static VOID AcquisitionThreadEntry(ULONG initial_input);
+static VOID AiThreadEntry(ULONG initial_input);
 static HAL_StatusTypeDef StartI2sReceive(void);
 static int32_t ClaimReadyI2sHalf(void);
 static void ReleaseProcessedI2sHalf(uint32_t half_index);
@@ -98,6 +111,12 @@ UINT App_ThreadX_Init(VOID *memory_ptr)
     return ret;
   }
 
+  ret = tx_semaphore_create(&ai_semaphore, "ai inference", 0U);
+  if (ret != TX_SUCCESS)
+  {
+    return ret;
+  }
+
   ret = tx_thread_create(&acquisition_thread,
                          "i2s acquisition",
                          AcquisitionThreadEntry,
@@ -108,6 +127,25 @@ UINT App_ThreadX_Init(VOID *memory_ptr)
                          ACQUISITION_THREAD_PRIORITY,
                          TX_NO_TIME_SLICE,
                          TX_AUTO_START);
+  if (ret != TX_SUCCESS)
+  {
+    return ret;
+  }
+
+  ret = tx_thread_create(&ai_thread,
+                         "keyword spotting",
+                         AiThreadEntry,
+                         0U,
+                         ai_thread_stack,
+                         sizeof(ai_thread_stack),
+                         AI_THREAD_PRIORITY,
+                         AI_THREAD_PRIORITY,
+                         TX_NO_TIME_SLICE,
+                         TX_AUTO_START);
+  if (ret != TX_SUCCESS)
+  {
+    return ret;
+  }
   /* USER CODE END App_ThreadX_Init */
 
   return ret;
@@ -139,6 +177,8 @@ static VOID AcquisitionThreadEntry(ULONG initial_input)
 
   (void)initial_input;
 
+  KwsAudio_Init();
+
   if (StartI2sReceive() != HAL_OK)
   {
     Error_Handler();
@@ -147,12 +187,49 @@ static VOID AcquisitionThreadEntry(ULONG initial_input)
   for (;;)
   {
     (void)tx_semaphore_get(&acquisition_semaphore, TX_WAIT_FOREVER);
+    bool inference_ready = false;
 
     while ((ready_half_index = ClaimReadyI2sHalf()) >= 0)
     {
       (void)USBD_AUDIO_RecordingPushLeft(i2s_rx_slots[ready_half_index],
-                                         I2S_RX_FRAMES_PER_HALF);
+                                         I2S_RX_FRAMES_PER_HALF);  
+
+
+      inference_ready = KwsAudio_PushI2s(i2s_rx_slots[ready_half_index],
+                                              I2S_RX_FRAMES_PER_HALF);
+
       ReleaseProcessedI2sHalf((uint32_t)ready_half_index);
+      
+      if (inference_ready)
+      {
+        (void)tx_semaphore_put(&ai_semaphore);
+      }
+    }
+  }
+}
+
+static VOID AiThreadEntry(ULONG initial_input)
+{
+  (void)initial_input;
+
+  aiPreInitialize();
+  if (aiInit() != 0)
+  {
+    HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_RESET);
+    return;
+  }
+
+  for (;;)
+  {
+    (void)tx_semaphore_get(&ai_semaphore, TX_WAIT_FOREVER);
+
+    if (KwsAudio_RunInference() != 0)
+    {
+      HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_RESET);
+    }
+    else
+    {
+      // HAL_GPIO_TogglePin(GREEN_LED_GPIO_Port, GREEN_LED_Pin);
     }
   }
 }

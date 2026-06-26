@@ -30,7 +30,7 @@ set(STM32_LINKER_SCRIPT STM32N657XX_AXISRAM2_fsbl.ld)
 set(STM32_LINKER_OPTION  )
 
 # Set the project name
-set(CMAKE_PROJECT_NAME n6_KEYWORD_FSBL)
+set(CMAKE_PROJECT_NAME n6_AI_Audio_FSBL)
 project(${CMAKE_PROJECT_NAME})
 
 # Create an executable object type
